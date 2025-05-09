@@ -1,0 +1,2 @@
+pyprojroot==0.3.0
+ollama==0.4.8
