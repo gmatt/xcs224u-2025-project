@@ -5,6 +5,9 @@ from typing import Literal, Optional, TypedDict, Union
 
 class Observation(TypedDict):
     screenshot: Optional[bytes]
+    accessibility_tree: Optional[str]
+    terminal: Optional[str]
+    instruction: str
 
 
 Action = Union[Literal["WAIT", "DONE", "FAIL"], str]
@@ -15,6 +18,7 @@ class BaseAgent(ABC):
     Copied form OSWorld/mm_agents/agent.py
     """
 
+    @abstractmethod
     def __init__(
         self,
         platform: Literal["ubuntu", "windows"] = "ubuntu",
