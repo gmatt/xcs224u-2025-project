@@ -26,7 +26,6 @@ class MainAgent(BaseAgent):
         self.history: list[str] = []
         self.model = model
         self.temperature = temperature
-        self.observation_type = observation_type
 
     action_space = "pyautogui"
 
@@ -103,28 +102,12 @@ class MainAgent(BaseAgent):
         self.history = []
 
     def predict(self, instruction: str, obs: Observation) -> tuple[str, list[Action]]:
-        # if self.observation_type == "som":
-        #     masks, drew_nodes, tagged_screenshot, linearized_accessibility_tree = (
-        #         tag_screenshot(
-        #             obs["screenshot"],
-        #             obs["accessibility_tree"],
-        #             platform="ubuntu",
-        #         )
-        #     )
-        #     screenshot = tagged_screenshot
-        # elif self.observation_type == "screenshot":
         screenshot = obs["screenshot"]
-        # else:
-        #     raise ValueError()
         rcParams["figure.dpi"] = 300
         plt.imshow(plt.imread(BytesIO(screenshot)))
         plt.show()
 
         prompt = f"My goal is the following: {instruction}\nI see this screen. What should I do next?"
-        #         prompt = f"""My goal is the following: {instruction}
-        # I made some progress and currently see this screen. What should I do next?
-        # First, give me a general explanation, then if the next step is a click, answer 'CLICK number',
-        # otherwise if it's a scroll, type, hotkey, etc, answer with a pyautogui code, like 'pyautogui.write(...)'"""
         print(prompt)
         response_text = self.ask_llm(
             prompt=prompt,
@@ -143,11 +126,6 @@ otherwise if it's a scroll, type, hotkey, etc, answer with a pyautogui code, lik
                 image=screenshot,
                 label=re.sub("click ", "", action_text, flags=re.IGNORECASE),
             )
-            # tag_number = int(
-            #     re.sub("click ", "", action_text, flags=re.IGNORECASE).strip(), base=10
-            # )
-            # action = f"pyautogui.click(tag_{tag_number})"
-            # action = parse_code_from_som_string(action, masks)
             action = f"pyautogui.click({coordinates['x']}, {coordinates['y']})"
         else:
             action = action_text
