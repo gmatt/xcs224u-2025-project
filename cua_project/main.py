@@ -18,6 +18,8 @@ def main(
 
     osworld_args = config()
     osworld_args.observation_type = "screenshot"
+    osworld_args.temperature = 0.0
+    osworld_args.sleep_after_execution = 5.0
 
     test_all_meta = json.loads(dataset_json_path.read_text())
 
