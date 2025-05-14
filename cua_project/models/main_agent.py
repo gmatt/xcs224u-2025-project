@@ -115,7 +115,7 @@ class MainAgent(BaseAgent):
         )
         print(response_text)
 
-        prompt = f"""Take the first step of the following instructions. If it's a click, answer 'CLICK <precise description where to click>',
+        prompt = f"""Take the first step of the following instructions. If it's a click, answer 'CLICK ' followed by a precise description where to click,
 otherwise if it's a scroll, type, hotkey, etc, answer with a pyautogui code, like 'pyautogui.write(...)'.
 ---
 {response_text}"""
