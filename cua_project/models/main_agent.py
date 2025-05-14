@@ -107,7 +107,7 @@ class MainAgent(BaseAgent):
         plt.imshow(plt.imread(BytesIO(screenshot)))
         plt.show()
 
-        prompt = f"My goal is the following: {instruction}\nI see this screen. What should I do next?"
+        prompt = f"My goal is the following: {instruction}\nI made some progress and currently see this screen. What should I do next?"
         print(prompt)
         response_text = self.ask_llm(
             prompt=prompt,
