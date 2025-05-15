@@ -61,7 +61,7 @@ class MainAgent(BaseAgent):
                 raise KeyboardInterrupt
             client = OpenAI()
             response = client.responses.create(
-                model="gpt-4.1-nano",
+                model=model,
                 temperature=self.temperature,
                 input=[
                     *(
