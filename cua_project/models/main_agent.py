@@ -34,9 +34,23 @@ class MainAgent(BaseAgent):
         prompt: str,
         image: Optional[bytes] = None,
         model: Optional[str] = None,
+        chat_history: Optional[list[str]] = None,
     ):
+        """
+
+        Args:
+            prompt:
+            image:
+            model:
+            chat_history: List of messages in the following order: query, response, query...
+
+        Returns:
+
+        """
         if model is None:
             model = self.model
+        if chat_history is None:
+            chat_history = []
 
         if model.startswith("gpt-"):
             if "Cancel" == pyautogui.confirm(
@@ -50,6 +64,32 @@ class MainAgent(BaseAgent):
                 model="gpt-4.1-nano",
                 temperature=self.temperature,
                 input=[
+                    *(
+                        message
+                        for query, response in zip(
+                            chat_history[::2], chat_history[1::2]
+                        )
+                        for message in (
+                            openai.types.responses.ResponseInputImageParam(
+                                role="user",
+                                content=[
+                                    openai.types.responses.ResponseInputTextParam(
+                                        type="input_text",
+                                        text=query,
+                                    ),
+                                ],
+                            ),
+                            openai.types.responses.ResponseInputImageParam(
+                                role="assistant",
+                                content=[
+                                    openai.types.responses.ResponseInputTextParam(
+                                        type="output_text",
+                                        text=response,
+                                    ),
+                                ],
+                            ),
+                        )
+                    ),
                     openai.types.responses.EasyInputMessageParam(
                         role="user",
                         content=[
@@ -69,7 +109,7 @@ class MainAgent(BaseAgent):
                                 else []
                             ),
                         ],
-                    )
+                    ),
                 ],
             )
             response_text = response.output_text
@@ -107,12 +147,19 @@ class MainAgent(BaseAgent):
         plt.imshow(plt.imread(BytesIO(screenshot)))
         plt.show()
 
-        prompt = f"My goal is the following: {instruction}\nI made some progress and currently see this screen. What should I do next?"
-        print(prompt)
+        if not self.history:
+            prompt = f"My goal is the following: {instruction}\nI see this screen. What should I do next?"
+            print(prompt)
+        else:
+            prompt = "Ok, now I see this screen. What should I do next?"
+            print([*self.history, prompt])
+        self.history.append(prompt)
         response_text = self.ask_llm(
             prompt=prompt,
             image=screenshot,
+            chat_history=self.history,
         )
+        self.history.append(response_text)
         print(response_text)
 
         prompt = f"""Take the first step of the following instructions. If it's a click, answer 'CLICK ' followed by a precise description where to click,
