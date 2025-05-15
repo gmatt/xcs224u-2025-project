@@ -21,6 +21,10 @@ def main(
     osworld_args.model = "gpt-4.1-nano-2025-04-14"
     osworld_args.temperature = 0.0
     osworld_args.sleep_after_execution = 5.0
+    # osworld_args.screen_width = 1024
+    # osworld_args.screen_height = 768
+    # Setting the resolution doesn't work, so we need to do this instead in run_single_example():
+    # env.setup_controller._execute_setup(["xrandr --output Virtual1 --mode 1024x768"], shell=True)
 
     test_all_meta = json.loads(dataset_json_path.read_text())
 
