@@ -41,7 +41,7 @@ class ManualAgent(BaseAgent):
                 raise KeyboardInterrupt
             client = OpenAI()
             response = client.responses.create(
-                model="gpt-4.1-nano",
+                model=self.model,
                 input=[
                     openai.types.responses.EasyInputMessageParam(
                         role="user",
