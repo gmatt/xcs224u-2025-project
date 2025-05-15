@@ -151,7 +151,9 @@ class MainAgent(BaseAgent):
             prompt = f"My goal is the following: {instruction}\nI see this screen. What should I do next?"
             print(prompt)
         else:
-            prompt = "Ok, now I see this screen. What should I do next?"
+            prompt = (
+                "Ok, I did one step and now I see this screen. What should I do next?"
+            )
             print([*self.history, prompt])
         self.history.append(prompt)
         response_text = self.ask_llm(
