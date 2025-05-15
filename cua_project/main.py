@@ -18,6 +18,7 @@ def main(
 
     osworld_args = config()
     osworld_args.observation_type = "screenshot"
+    osworld_args.model = "gpt-4.1-nano-2025-04-14"
     osworld_args.temperature = 0.0
     osworld_args.sleep_after_execution = 5.0
 
