@@ -1,13 +1,11 @@
 import base64
 import re
-from io import BytesIO
 from logging import Logger
 from typing import Optional
 
 import ollama
 import openai.types.responses
 import pyautogui
-from matplotlib import pyplot as plt, rcParams
 from openai import OpenAI
 
 from cua_project.models.base_agent import Action, BaseAgent, Observation
@@ -144,31 +142,16 @@ class MainAgent(BaseAgent):
         self.history = []
 
     def predict(self, instruction: str, obs: Observation) -> tuple[str, list[Action]]:
-        # if self.first_response:
-        #     prompt = (
-        #         "Compare the instructions with the commands already executed.\n"
-        #         "Is the task complete based on the commands according to the instructions?\n"
-        #         "Answer only with DONE or INCOMPLETE.\n"
-        #         "Instructions:\n" + self.first_response + "\n"
-        #         "Commands executed:\n" + "".join(f"- {l}\n" for l in self.history)
-        #     )
-        #     if self.ask_llm(prompt) == "DONE":
-        #         if "Yes" == pyautogui.confirm(
-        #             text="LLM thinks we're done. Finish?",
-        #             buttons=["Yes", "No"],
-        #         ):
-        #             return "DONE", ["DONE"]
-
-        # choice = pyautogui.confirm(text="Done?", buttons=["Yes", "No", "Abort"])
-        # if choice == "Yes":
-        #     return "DONE", ["DONE"]
-        # elif choice == "Abort":
-        #     return "FAIL", ["FAIL"]
+        choice = pyautogui.confirm(text="Done?", buttons=["Yes", "No", "Abort"])
+        if choice == "Yes":
+            return "DONE", ["DONE"]
+        elif choice == "Abort":
+            return "FAIL", ["FAIL"]
 
         screenshot = obs["screenshot"]
-        rcParams["figure.dpi"] = 300
-        plt.imshow(plt.imread(BytesIO(screenshot)))
-        plt.show()
+        # rcParams["figure.dpi"] = 300
+        # plt.imshow(plt.imread(BytesIO(screenshot)))
+        # plt.show()
 
         if not USE_HISTORY or not self.history:
             prompt = (
@@ -196,7 +179,6 @@ class MainAgent(BaseAgent):
         self.history.append(response_text)
         print(response_text)
 
-        # Other actions include DONE, or FAIL if the task is impossible.
         prompt = (
             # "Take the first actionable step (that's not already done) of the following instructions.\n"
             "Take the first step of the following instructions.\n"
@@ -208,19 +190,6 @@ class MainAgent(BaseAgent):
             "---\n"
             f"{response_text}"
         )
-        # prompt = (
-        #     # "Take the first actionable step (that's not already done) of the following instructions.\n"
-        #     # "Take the first step of the following instructions.\n"
-        #     # "If a step seems already done, like the menu is already open, take the next one instead.\n"
-        #     "Take the next step of the following instructions.\n"
-        #     "If it's a click, answer 'CLICK ' followed by a precise description where to click,\n"
-        #     "otherwise if it's a scroll, type, hotkey, etc, answer with a pyautogui code, like 'pyautogui.write(...)'.\n"
-        #     "If all steps are done, answer 'DONE'.\n"
-        #     "---\n"
-        #     "Steps already done, skip these:\n"
-        #     "".join(f"- {l}\n" for l in self.history) + "---\n"
-        #     f"{response_text}"
-        # )
         action_text = self.ask_llm(
             prompt=prompt,
             # A small model is enough for this independent of the 'main' model.
