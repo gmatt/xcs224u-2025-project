@@ -13,6 +13,8 @@ from openai import OpenAI
 from cua_project.models.base_agent import Action, BaseAgent, Observation
 from cua_project.util.localizer_client import LocalizerClient
 
+USE_HISTORY = False
+
 
 class MainAgent(BaseAgent):
     def __init__(
@@ -147,7 +149,7 @@ class MainAgent(BaseAgent):
         plt.imshow(plt.imread(BytesIO(screenshot)))
         plt.show()
 
-        if not self.history:
+        if not USE_HISTORY or not self.history:
             prompt = f"My goal is the following: {instruction}\nI see this screen. What should I do next?"
             print(prompt)
         else:
@@ -159,7 +161,7 @@ class MainAgent(BaseAgent):
         response_text = self.ask_llm(
             prompt=prompt,
             image=screenshot,
-            chat_history=self.history,
+            chat_history=self.history if USE_HISTORY else None,
         )
         self.history.append(response_text)
         print(response_text)
